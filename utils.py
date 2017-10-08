@@ -10,7 +10,3 @@ def get_day_slot(hour):
         return 'afternoon'
     else:
         return 'evening'
-
-
-if __name__ == '__main__':
-    pass

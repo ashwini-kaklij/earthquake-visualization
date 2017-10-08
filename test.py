@@ -5,6 +5,7 @@ from utils import get_day_slot
 
 
 class TestEarthquakeApp(unittest.TestCase):
+
     def setUp(self):
         self.url = 'http://localhost:5002/api/v1/earthquake-data/2016-01-01/2016-01-31'
 
