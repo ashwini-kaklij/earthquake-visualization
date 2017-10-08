@@ -1,5 +1,6 @@
 import datetime
 from mpl_toolkits.basemap import Basemap
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
@@ -12,7 +13,8 @@ class Earthquake(object):
     def __init__(self, url, params={}):
         self.request_url = url
         self.params = params
-        self.plot_dayslot_with_magnitude()
+        self.fetch_url()
+        self.plot_time_slot_with_magnitude()
         self.plot_with_magnitude()
         self.plot_with_status_and_magnitude()
         self.plot_with_earthquake_status()
@@ -26,8 +28,8 @@ class Earthquake(object):
         :return:
         """
         data = requests.get(self.request_url)
-        response = data.json()
-        return response
+        self.response = data.json()
+        return self.response
 
     @staticmethod
     def init_basemap():
@@ -42,12 +44,13 @@ class Earthquake(object):
         map.drawparallels(np.arange(-90, 90, 30))
         return map
 
-    def plot_dayslot_with_magnitude(self):
+    def plot_time_slot_with_magnitude(self):
         """
-        Data plotting
+        Plot the map on basis of particular interval of day
+        e.g. Morning, Evening, Afternoon, Night
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -56,20 +59,25 @@ class Earthquake(object):
             for lon, lat, mag, time_slot in zip(lons, lats, mags, time_slots):
                 if mag is not None:
                     x, y = map(lon, lat)
-                    msize = mag * MARKER_SIZE
-                    marker_string = self.set_slot_marker_color(time_slot)
-                    map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes of Magnitude 1.0 or Greater :for Status is REVIEWED \n"
+                    marker_string, time_value = self.set_slot_marker_color(time_slot)
+                    msize = time_value * MARKER_SIZE
+                    map.plot(x, y,marker_string, markersize=msize)
+        title_string = "Earthquakes on basis of time \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='Night')
+        med = mpatches.Patch(color='olive', label='Morning')
+        med1 = mpatches.Patch(color='red', label='Afternoon')
+        high = mpatches.Patch(color='orange', label='Evening')
+        plt.legend(handles=[low, med,med1, high], title='Earthquakes Time')
         plt.title(title_string)
         plt.show()
 
     def plot_with_magnitude(self):
         """
-        Data plotting
+        Plot the map on basis of Magnitude values
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -82,15 +90,19 @@ class Earthquake(object):
                     map.plot(x, y, marker_string, markersize=msize)
         title_string = "Earthquakes of Magnitude 1.0 or Greater \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='< 3')
+        med = mpatches.Patch(color='olive', label='< 5')
+        high = mpatches.Patch(color='red', label='> 5')
+        plt.legend(handles=[low, med, high], title='Earthquakes Magnitude')
         plt.title(title_string)
         plt.show()
 
     def plot_with_status_and_magnitude(self):
         """
-        Data plotting
+        Plot the map on basis of magnitude where status is reviewed
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -102,17 +114,21 @@ class Earthquake(object):
                     msize = mag * MARKER_SIZE
                     marker_string = self.set_marker_color(mag)
                     map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes of Magnitude 1.0 or Greater :for Status is REVIEWED \n"
+        title_string = "Earthquakes of Magnitude 1.0 or Greater :for Status is 'REVIEWED' \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='< 3')
+        med = mpatches.Patch(color='olive', label='< 5')
+        high = mpatches.Patch(color='red', label='> 5')
+        plt.legend(handles=[low, med, high], title='Earthquakes Magnitude')
         plt.title(title_string)
         plt.show()
 
     def plot_with_earthquake_status(self):
         """
-        Data plotting
+        Plot the map on basis of Status -reviewed, automatic, deleted
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -125,15 +141,19 @@ class Earthquake(object):
                 map.plot(x, y, marker_string, markersize=msize)
         title_string = "Earthquakes on basis of Status  \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='automatic')
+        med = mpatches.Patch(color='olive', label='reviewed')
+        high = mpatches.Patch(color='red', label='deleted')
+        plt.legend(handles=[low, med, high], title='Earthquakes Status')
         plt.title(title_string)
         plt.show()
 
     def plot_alert(self):
         """
-        Data plotting
+        Plot the map on basis of alert:green, yellow, orange, red
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -143,17 +163,22 @@ class Earthquake(object):
                 marker_string, alert_val = self.set_alert_color(alert)
                 msize = alert_val * MARKER_SIZE
                 map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes of Magnitude 1.0 or Greater \n"
+        title_string = "Earthquakes data on basis of Alerts \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='green')
+        med = mpatches.Patch(color='olive', label='yellow')
+        med1 = mpatches.Patch(color='orange', label='orange')
+        high = mpatches.Patch(color='red', label='red')
+        plt.legend(handles=[low, med, med1, high], title='Earthquakes Alerts')
         plt.title(title_string)
         plt.show()
 
     def plot_tsunami(self):
         """
-        Data plotting
+        Plot the map on basis of whether it was tsunami or not
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -163,17 +188,20 @@ class Earthquake(object):
                 marker_string, tsunamies_val = self.set_tsunamies_color(tsunami)
                 msize = tsunamies_val * MARKER_SIZE
                 map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes On basis of tsunami Values \n"
+        title_string = "Earthquakes data on basis of tsunami values \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='No')
+        med = mpatches.Patch(color='red', label='Yes')
+        plt.legend(handles=[low, med], title='Earthquakes Tsunami')
         plt.title(title_string)
         plt.show()
 
     def plot_tsunami_with_magnitude(self):
         """
-        Data plotting
+        Plot the map on basis of magnitude and tsunami
         """
         map = self.init_basemap()
-        data = self.fetch_url()
+        data = self.response
         for res in data.values():
             lats = res['lats']
             lons = res['lons']
@@ -182,25 +210,41 @@ class Earthquake(object):
             for lon, lat, mag, tsunamies in zip(lons, lats, mags, tsunamies):
                 if mag is not None and tsunamies == 1:
                     x, y = map(lon, lat)
-                    msize = mag * 3
+                    msize = mag * MARKER_SIZE
                     marker_string = self.set_marker_color_mag(mag)
                     map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes magnitudes basis of tsunami Values of 1 \n"
+        title_string = "Earthquakes data for magnitudes for basis of tsunami :Present \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
+        low = mpatches.Patch(color='green', label='> 3')
+        med = mpatches.Patch(color='olive', label='> 4')
+        high = mpatches.Patch(color='red', label='> 5')
+        plt.legend(handles=[low, med, high], title='Earthquakes Magnitude')
         plt.title(title_string)
         plt.show()
 
     @staticmethod
     def set_slot_marker_color(time_slot):
-        if time_slot == 'morning':
-            return 'go'
-        elif time_slot == 'afternoon':
-            return 'yo'
+        """
+        to get marker colour on basis of time_slot
+        :param time_slot:
+        :return: str, int
+        """
+        if time_slot == 'Night':
+            return 'go', 2
+        elif time_slot == 'Morning':
+            return 'yo', 3
+        elif time_slot == 'Afternoon':
+            return 'ro', 3
         else:
-            return 'ro'
+            return 'or', 4
 
     @staticmethod
     def set_marker_color(magnitude):
+        """
+        to get marker color on basis of magnitude value
+        :param magnitude:
+        :return: str
+        """
         if magnitude < 3.0:
             return 'go'
         elif magnitude < 5.0:
@@ -210,6 +254,11 @@ class Earthquake(object):
 
     @staticmethod
     def set_status_color(status):
+        """
+        to get marker color on basis  status
+        :param status:
+        :return: str, int
+        """
         if status == "automatic":
             return 'go',  2
         elif status == "reviewed":
@@ -219,6 +268,11 @@ class Earthquake(object):
 
     @staticmethod
     def set_alert_color(alert):
+        """
+        to get marker color on basis alerts value
+        :param alert:
+        :return: str, int
+        """
         if alert == "green":
             return 'go', 2
         elif alert == "yellow":
@@ -230,6 +284,11 @@ class Earthquake(object):
 
     @staticmethod
     def set_tsunamies_color(tsunami):
+        """
+        to get marker color on basis of tsunami value
+        :param tsunami:
+        :return: str, int
+        """
         if tsunami == 1:
             return 'ro', 4
         else:
@@ -237,12 +296,18 @@ class Earthquake(object):
 
     @staticmethod
     def set_marker_color_mag(magnitude):
-        if 3.0 > magnitude < 4.0:
+        """
+        to get marker color on basis of magnitude value
+        :param magnitude:
+        :return: str
+        """
+        if magnitude > 3.0 and magnitude < 4.0 :
             return 'go'
-        elif 4.0 > magnitude < 5.0:
+        elif magnitude > 4.0 and magnitude < 5.0 :
             return 'yo'
-        elif magnitude > 5.0 and magnitude < 6.0:
+        elif magnitude > 5.0 :
             return 'ro'
+
 
 if __name__ == "__main__":
     PARAMS = {

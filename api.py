@@ -5,8 +5,8 @@ from flask import Flask, jsonify
 from flask_restful import Resource, Api
 from utils import get_day_slot
 
-APP = Flask(__name__)
-api = Api(APP)
+app = Flask(__name__)
+api = Api(app)
 
 
 class EarthquakeData(Resource):
