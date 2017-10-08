@@ -1,16 +1,16 @@
 import unittest
-from plot_graph import multiply
+import requests
 
 
-class TestUM(unittest.TestCase):
+class TestEarthquakeApp(unittest.TestCase):
     def setUp(self):
-        pass
+        self.url = 'http://localhost:5002/api/v1/earthquake-data/2016-01-01/2016-01-31'
 
-    def test_numbers_3_4(self):
-        self.assertEqual(multiply(3, 4), 12)
-
-    def test_strings_a_3(self):
-        self.assertEqual(multiply('a', 3), 'aaa')
+    def test_hello_world(self):
+        response = requests.get(self.url)
+        data = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data['properties'])
 
 
 if __name__ == '__main__':
