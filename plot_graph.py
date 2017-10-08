@@ -8,17 +8,19 @@ MARKER_SIZE = 2
 
 
 class Earthquake(object):
-    
+
     def __init__(self, url, params={}):
         self.request_url = url
         self.params = params
         self.plot_dayslot_with_magnitude()
+        """
         self.plot_with_magnitude()
         self.plot_with_status_and_magnitude()
         self.plot_with_earthquake_status()
         self.plot_alert()
         self.plot_tsunami()
         self.plot_tsunami_with_magnitude()
+        """
 
     def fetch_url(self):
         """
@@ -237,9 +239,9 @@ class Earthquake(object):
 
     @staticmethod
     def set_marker_color_mag(magnitude):
-        if magnitude > 3.0 and magnitude < 4.0:
+        if 3.0 > magnitude < 4.0:
             return 'go'
-        elif magnitude > 4.0 and magnitude < 5.0:
+        elif 4.0 > magnitude < 5.0:
             return 'yo'
         elif magnitude > 5.0 and magnitude < 6.0:
             return 'ro'
