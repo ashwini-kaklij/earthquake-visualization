@@ -1,3 +1,4 @@
+import datetime
 import requests
 from multiprocessing.pool import ThreadPool
 from flask import Flask, jsonify, request
@@ -12,8 +13,8 @@ class EarthquakeData(Resource):
 
     def __init__(self):
         self.request_url = "https://earthquake.usgs.gov/fdsnws/event/1/query"
-        self.limit = 100
-        self.total = 500
+        self.limit = 1000
+        self.total = 10000
         self.param = {
             'format': 'geojson',
             'limit': self.limit
@@ -32,15 +33,33 @@ class EarthquakeData(Resource):
         lats = []
         lons = []
         magnitudes = []
+        statuses = []
+        alerts = []
+        tsunamies = []
+        time_slots = []
         for res, error in results:
             if error is None:
                 for data in res['features']:
                     lons.append(data['geometry']['coordinates'][0])
                     lats.append(data['geometry']['coordinates'][1])
                     magnitudes.append(data['properties']['mag'])
+                    statuses.append(data['properties']['status'])
+                    slot = self.get_day_slot(data['properties']['time'])
+                    time_slots.append(slot)
+                    alerts.append(data['properties']['alert'])
+                    tsunamies.append(data['properties']['tsunami'])
             else:
                 return "error fetching %r: %s" % error
-        earth_quake_data.update({'properties': {'lats': lats, 'lons': lons, 'magnitudes': magnitudes}})
+        earth_quake_data.update({'properties': {
+            'lats': lats,
+            'lons': lons,
+            'magnitudes': magnitudes,
+            'statuses': statuses,
+            'alerts': alerts,
+            'tsunamies': tsunamies,
+            'time_slots': time_slots
+            },
+        })
         return jsonify(earth_quake_data)
 
     def fetch_url(self, offset):
@@ -52,6 +71,17 @@ class EarthquakeData(Resource):
             return res.json(), None
         except Exception as e:
             return None, e
+
+    @staticmethod
+    def get_day_slot(time):
+        hour = int(datetime.datetime.fromtimestamp(int(time) / 1000.0).strftime('%H'))
+        if hour < 12:
+            return 'morning'
+        elif 12 <= hour < 18:
+            return 'afternoon'
+        else:
+            return 'evening'
+
 
 api.add_resource(EarthquakeData, '/api/v1/earthquake-data/<string:start>/<string:end>')
 
