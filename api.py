@@ -1,12 +1,12 @@
 import datetime
 import requests
 from multiprocessing.pool import ThreadPool
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_restful import Resource, Api
+from utils import get_day_slot
 
-
-app = Flask(__name__)
-api = Api(app)
+APP = Flask(__name__)
+api = Api(APP)
 
 
 class EarthquakeData(Resource):
@@ -44,7 +44,11 @@ class EarthquakeData(Resource):
                     lats.append(data['geometry']['coordinates'][1])
                     magnitudes.append(data['properties']['mag'])
                     statuses.append(data['properties']['status'])
-                    slot = self.get_day_slot(data['properties']['time'])
+                    hour = 0
+                    if data['properties']['time'] is not None:
+                        millisecs = int(data['properties']['time'])
+                        hour = int(datetime.datetime.fromtimestamp(millisecs / 1000.0).strftime('%H'))
+                    slot = get_day_slot(hour)
                     time_slots.append(slot)
                     alerts.append(data['properties']['alert'])
                     tsunamies.append(data['properties']['tsunami'])
@@ -71,16 +75,6 @@ class EarthquakeData(Resource):
             return res.json(), None
         except Exception as e:
             return None, e
-
-    @staticmethod
-    def get_day_slot(time):
-        hour = int(datetime.datetime.fromtimestamp(int(time) / 1000.0).strftime('%H'))
-        if hour < 12:
-            return 'morning'
-        elif 12 <= hour < 18:
-            return 'afternoon'
-        else:
-            return 'evening'
 
 
 api.add_resource(EarthquakeData, '/api/v1/earthquake-data/<string:start>/<string:end>')

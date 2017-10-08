@@ -13,14 +13,12 @@ class Earthquake(object):
         self.request_url = url
         self.params = params
         self.plot_dayslot_with_magnitude()
-        """
         self.plot_with_magnitude()
         self.plot_with_status_and_magnitude()
         self.plot_with_earthquake_status()
         self.plot_alert()
         self.plot_tsunami()
         self.plot_tsunami_with_magnitude()
-        """
 
     def fetch_url(self):
         """
@@ -231,8 +229,8 @@ class Earthquake(object):
             return 'ro', 2
 
     @staticmethod
-    def set_tsunamies_color(tsunamies):
-        if tsunamies == 1:
+    def set_tsunamies_color(tsunami):
+        if tsunami == 1:
             return 'ro', 4
         else:
             return 'go', 2
