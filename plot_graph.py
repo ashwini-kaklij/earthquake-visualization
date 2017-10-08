@@ -114,7 +114,7 @@ class Earthquake(object):
                     msize = mag * MARKER_SIZE
                     marker_string = self.set_marker_color(mag)
                     map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes of Magnitude 1.0 or Greater :for Status is 'REVIEWED' \n"
+        title_string = "Earthquakes of Magnitude 1.0 or Greater with status is REVIEWED \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
         low = mpatches.Patch(color='green', label='< 3')
         med = mpatches.Patch(color='olive', label='< 5')
@@ -213,7 +213,7 @@ class Earthquake(object):
                     msize = mag * MARKER_SIZE
                     marker_string = self.set_marker_color_mag(mag)
                     map.plot(x, y, marker_string, markersize=msize)
-        title_string = "Earthquakes data for magnitudes for basis of tsunami :Present \n"
+        title_string = "Earthquakes data with magnitudes on basis of tsunami: Yes \n"
         title_string += str(self.params['start']) + ' through ' + str(self.params['end'])
         low = mpatches.Patch(color='green', label='> 3')
         med = mpatches.Patch(color='olive', label='> 4')
