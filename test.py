@@ -19,9 +19,9 @@ class TestEarthquakeApp(unittest.TestCase):
         morning = get_day_slot(11)
         afternoon = get_day_slot(15)
         evening = get_day_slot(21)
-        self.assertEqual(morning, 'morning')
-        self.assertEqual(afternoon, 'afternoon')
-        self.assertEqual(evening, 'evening')
+        self.assertEqual(morning, 'Morning')
+        self.assertEqual(afternoon, 'Afternoon')
+        self.assertEqual(evening, 'Evening')
 
 
 if __name__ == '__main__':
