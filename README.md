@@ -9,6 +9,7 @@ Install below python packages
 2. matplotlib
 3. numpy
 4. flask_restful
+5. nose
 
 Install Basemap using Ubuntu’s standard packages
 
@@ -31,8 +32,11 @@ Now execute plot_map.py which calls the above API and plots the points on maps.
 6. Plot the map on basis of whether it was tsunami or not
 7. Plot the map on basis of magnitude and tsunami
 
-There are 7 maps of which screenshots are captured and attached in maps folder.
+There are 7 maps, Screenshots are captured and attached in the maps folder.
 
 There are 2 unit tests at the moment.
-1. Checks the response of API
-2. Validates the slot of the day based on the parameter
+1. First test case checks the response of API
+2. Second test case validates the slot of the day based on the hour
+
+
+
